@@ -4,12 +4,10 @@
 #define Fan 3
 #define Light 4
 #define TV 5
-
 int temp=0,i=0;
-int led=13;
-
+int led=13; 
 char str[15];
-
+int level=0;
 #include <NewPing.h>
 
 #define TRIGGER_PIN  12  // Arduino pin tied to trigger pin on the ultrasonic sensor.
@@ -20,42 +18,32 @@ NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and
 
 void setup()
 {
-//  lcd.begin(16,2);
   Serial.begin(9600);
   pinMode(led, OUTPUT);
    pinMode(Fan, OUTPUT);
     pinMode(Light, OUTPUT);
-     pinMode(TV, OUTPUT);
-  
-//  lcd.setCursor(0,0);
-//  lcd.print("GSM Control Home");
-//  lcd.setCursor(0,1);
-//  lcd.print("   Automaton    ");
+    pinMode(TV, OUTPUT); 
   delay(2000);
-//  lcd.clear();
-//  lcd.print("Circuit Digest");
-  delay(1000);
-//  lcd.setCursor(0,1);
-//  lcd.print("System Ready");
+  delay(2000);
   Serial.print("AT+CNMI=1,2,0,0,0");
   delay(200);
   Serial.write(byte(13));
   delay(500);
-  Serial.print("AT+CMGF=1");
+ Serial.print("AT+CMGF=1");  
   delay(200);
   Serial.write(byte(13));
-  delay(1000);
-//  lcd.clear();
-//  lcd.setCursor(0,0);
-//  lcd.print("Fan   Light  TV ");
-//  lcd.setCursor(0,1);
-//  lcd.print("OFF    OFF   OFF "); 
+  delay(500);
+//  Serial.print("AT+CMGS=\"+2348057471307\"");
+//  delay(200);
+//  Serial.write(byte(13));
+//  delay(500);  
+//  Serial.print("WELCOME LEVEL SENSING ACTIVATED");
+//  Serial.write(byte(26)); 
+  delay(500);    
 }
 
 void loop()
 {
-//  lcd.setCursor(0,0);
-//  lcd.print("Fan   Light  TV");
   if(temp==1)
   {
     check();
@@ -63,10 +51,9 @@ void loop()
     i=0;
     delay(1000);
   }
-  //  Serial.print("Ping: ");
-//  Serial.print(sonar.ping_cm()); // Send ping, get distance in cm and print result (0 = outside set distance range)
-//  Serial.println("cm");
-
+//level = sonar.ping_cm();
+// LevelData=sonar.ping_cm(); // Send ping, get distance in cm and print result (0 = outside set distance range)
+//delay(500);  
 }
 
  void serialEvent() 
@@ -103,6 +90,10 @@ void check()
       delay(1000);
       digitalWrite(led, LOW);
       delay(200);
+  Serial.print("AT+CNMI=1,2,0,0,0");
+  delay(200);
+  Serial.write(byte(13));
+  delay(500);
   Serial.print("AT+CMGF=1");  
   delay(200);
   Serial.write(byte(13));
@@ -113,6 +104,7 @@ void check()
   delay(500);  
   Serial.print("LEVEL: ");
   Serial.print(sonar.ping_cm()); // Send ping, get distance in cm and print result (0 = outside set distance range)
+//  Serial.print(level);
   Serial.print("cm");
   Serial.write(byte(26)); 
   delay(500);    
