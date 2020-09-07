@@ -32,14 +32,7 @@ void setup()
  Serial.print("AT+CMGF=1");  
   delay(200);
   Serial.write(byte(13));
-  delay(500);
-//  Serial.print("AT+CMGS=\"+2348057471307\"");
-//  delay(200);
-//  Serial.write(byte(13));
-//  delay(500);  
-//  Serial.print("WELCOME LEVEL SENSING ACTIVATED");
-//  Serial.write(byte(26)); 
-  delay(500);    
+  delay(1000);    
 }
 
 void loop()
@@ -51,9 +44,7 @@ void loop()
     i=0;
     delay(1000);
   }
-//level = sonar.ping_cm();
-// LevelData=sonar.ping_cm(); // Send ping, get distance in cm and print result (0 = outside set distance range)
-//delay(500);  
+ 
 }
 
  void serialEvent() 
