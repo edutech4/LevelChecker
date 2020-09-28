@@ -107,27 +107,33 @@ tabulate_depth();
   data_percent = Depth_Liters*100;
   Percent = data_percent/1000;
   
-  levelThreshold = EEPROM.read(0);
+  levelThreshold = int(EEPROM.read(0));
   if(Percent<= levelThreshold && sent_flag ==0){
-  send_init();
-  Serial.print("AT+CMGS=\"");
-  for(int j=0;j<14;j++){
-    Serial.print(EEPROM.read(j+2));
-    delay(20);
-  }   
-  Serial.print("\"");
-  delay(200);
-  Serial.write(byte(13));
-  delay(500);  
-  Serial.print("PLEASE REFILL DIESEL.");
-   Serial.write(byte(26)); 
-  delay(500); 
+      cnt = 0;
+    for(int i=0; i<3; i++){///SEND MESAGE TO THE 3 ADMIN NUMBER
+       send_init();
+       Serial.print("AT+CMGS=\"");
+       for(int k=120+cnt;k<134+cnt;k++){
+          Serial.write(EEPROM.read(k)); 
+        }
+      Serial.print("\"");
+      delay(200);
+      Serial.write(byte(13));
+      delay(500); 
+      Serial.print("PLEASE REFILL DIESEL.");
+      Serial.write(byte(26));
+      cnt+=15;
+      delay(3000);
+       }
   EEPROM.write(send_flag_addr, 1);
   sent_flag=1;
   Serial.print("AT+CMGD=1,4");
   delay(500);
   Serial.write(byte(13));
   delay(500);
+  }
+  if(Percent>= levelThreshold){
+    EEPROM.write(send_flag_addr, 0);
   }
 }
 
@@ -234,14 +240,14 @@ void tabulate_depth(){
   arr[k] = real_depth;
  } 
  nt=0;
- for(int k=0;k<20;k++){
+ for(int k=0;k<20;k++){// Sort for the highest consistent data in the array.
     cnt=0;
   if(nt == 0){
    for(int j=0;j<20;j++){
     if(arr[k] == arr[j]){
       cnt++;
       real_depth=arr[k];
-      if(cnt>14){
+      if(cnt>14){/// The most consistent becomes the most accurate.
         nt = 1;
         break;
       }
@@ -264,7 +270,6 @@ void check()
        break; 
      }
    }
-
 //   Serial.println(" ");
 //   for(int j=0;j<60;j++){
 //   Serial.print(str[j]); 
@@ -307,18 +312,20 @@ void check()
 //    Serial.print(msg[j]);
 //   }
 
-tabulate_depth();
- 
+tabulate_depth(); 
 //real_depth = sonar.ping_cm();
-cnt=0;
-while(real_depth ==0 || real_depth<0){
+if(real_depth ==0 || real_depth<0){
+ cnt=0;
+ while(real_depth ==0 || real_depth<0){
   real_depth = sonar.ping_cm();
   cnt++;
   if(cnt>10){
     break;
   }
   delay(50);
+} 
 }
+
 //if(!(real_depth>=0 && real_depth<=98)){
 //  real_depth = 0;
 //}
@@ -336,10 +343,10 @@ data_percent = Depth_Liters*100;
 Percent = data_percent/1000;
 //Serial.println(Percent);
 //  Serial.print(sonar.ping_cm()); // Send ping, get distance in cm and print result (0 = outside set distance range)
-  Serial.print(Depth_Liters);
+  Serial.print(Depth_Liters,2);// 2 decimal places
   Serial.print(" Liters");
   Serial.print(",  ");
-  Serial.print(Percent);
+  Serial.print(Percent,2);// 2 decimal places
   Serial.print("%");
   Serial.print(".");
   Serial.write(byte(26)); 
@@ -547,7 +554,7 @@ Percent = data_percent/1000;
           EEPROM.write(j, msg[j-112]);    
           delay(20);
         }
-        Serial.print("SUCCESS Admin Reg1...");
+//        Serial.print("SUCCESS Admin Reg1...");
       }
       }
       if(int(msg[7])== '2'){
@@ -568,7 +575,7 @@ Percent = data_percent/1000;
           EEPROM.write(j, msg[j-127]);    
           delay(20);
         }
-        Serial.print("SUCCESS Admin Reg2...");
+//        Serial.print("SUCCESS Admin Reg2...");
       }
       }
       if(int(msg[7])== '3'){
@@ -589,10 +596,10 @@ Percent = data_percent/1000;
           EEPROM.write(j, msg[j-142]);    
           delay(20);
         }
-        Serial.print("SUCCESS Admin Reg3...");
+//        Serial.print("SUCCESS Admin Reg3...");
       }
       }
-      Serial.print("Entered ADMIN");
+//      Serial.print("Entered ADMIN");
      
     }
        else if(!(strncmp(msg,"D.ViewAdmin*",12)))
@@ -613,15 +620,15 @@ Percent = data_percent/1000;
       delay(500);  
       Serial.print("ADMIN: ");
       for(int j=120;j<134;j++){
-        Serial.write(EEPROM.read(j));       
+        Serial.write(EEPROM.read(j));   //FIRST NUMBER    
       }  
         Serial.print(", ");  
       for(int j=135;j<149;j++){
-        Serial.write(EEPROM.read(j));       
+        Serial.write(EEPROM.read(j));   //SECOND NUMBER      
       }    
         Serial.print(", ");  
       for(int j=150;j<164;j++){
-        Serial.write(EEPROM.read(j));       
+        Serial.write(EEPROM.read(j));   //THIRD NUMBER    
       }  
         Serial.print(".");       
       Serial.write(byte(26)); 
@@ -632,7 +639,25 @@ Percent = data_percent/1000;
       Serial.write(byte(13));
       delay(500);        
     }
-
+ else if(!(strncmp(msg,"D.TEST*",7)))
+    {
+//      cnt = 0;
+//    for(int i=0; i<3; i++){
+//       send_init();
+//       Serial.print("AT+CMGS=\"");
+//       for(int k=120+cnt;k<134+cnt;k++){
+//          Serial.write(EEPROM.read(k)); 
+//        }
+//      Serial.print("\"");
+//      delay(200);
+//      Serial.write(byte(13));
+//      delay(500); 
+//      Serial.print("PLEASE REFILL DIESEL.");
+//      Serial.write(byte(26));
+//      cnt+=15;
+//      delay(3000);
+//       }
+    }
  
 
     
